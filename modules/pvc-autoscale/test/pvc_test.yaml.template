@@ -1,0 +1,194 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pvc-test-ns
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: pvc-test-ns
+  name: pvc-test-sa
+automountServiceAccountToken: true
+
+#---
+#
+#apiVersion: rbac.authorization.k8s.io/v1
+#kind: ClusterRole
+#metadata:
+#  name: shoreline-agent
+#rules:
+#- apiGroups: [""]
+#  resources: ["endpoints", "services"]
+#  verbs: ["get", "list", "watch"]
+#- apiGroups: [""]
+#  resources: ["namespaces", "pods"]
+#  verbs: ["get", "list", "watch"]
+#- apiGroups: [""]
+#  resources: ["pods/exec"]
+#  verbs: ["get", "create"]
+#- apiGroups: [""]
+#  resources: ["nodes", "nodes/metrics"]
+#  verbs: ["get", "list", "patch", "watch"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: pvc-test-ns
+  name: pvc-test-sa-role
+rules:
+- apiGroups: [""]
+  resources: ["endpoints", "services"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["events", "namespaces", "pods", "pods/log"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["get", "create"]
+- apiGroups: [""]
+  resources: ["persistenvolumes", "persistentvolumeclaims"]
+  verbs: ["get", "list", "patch", "watch"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: pvc-test-ns
+  name: pvc-test-sa-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: pvc-test-sa-role
+subjects:
+- kind: ServiceAccount
+  namespace: pvc-test-ns
+  name: pvc-test-sa
+  #name: system:serviceaccount:pvc-test-sa
+  #apiGroup: rbac.authorization.k8s.io
+
+#---
+#
+#apiVersion: v1
+#kind: PersistentVolume
+#metadata:
+#  name: resize-test-pv
+#  #namespace: ${CLUSTER}-cust
+#  namespace: pvc-test-ns
+#  labels:
+#    type: local
+#spec:
+#  storageClassName: manual
+#  capacity:
+#    storage: 1Gi
+#  accessModes:
+#    - ReadWriteOnce
+#  hostPath:
+#    path: "/tofill"
+
+---
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  namespace: pvc-test-ns
+  name: pvc-test-storage-class
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+  fsType: ext4
+allowVolumeExpansion: true
+
+#---
+#
+#apiVersion: v1
+#kind: PersistentVolume
+#metadata:
+#  name: resize-test-pv
+#  labels:
+#    type: resize-pvc-test
+#spec:
+#  capacity:
+#    storage: 1Gi
+#  accessModes:
+#    - ReadWriteOnce
+#  storageClassName: pvc-test-storage-class
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  #namespace: ${CLUSTER}-cust
+  namespace: pvc-test-ns
+  name: resize-pvc-test
+  labels:
+     type: aws-pvc
+spec:
+  #storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  #selector:
+  #  matchLabels:
+  #    type: resize-pvc-test
+  storageClassName: pvc-test-storage-class
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: pvc-test
+  name: pvc-test
+  #namespace: ${CLUSTER}-cust
+  namespace: pvc-test-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pvc-test
+  template:
+    metadata:
+      #annotations:
+      #  sidecar.istio.io/extraStatTags: request_path
+      labels:
+        app: pvc-test
+    spec:
+      nodeSelector:
+          eks.amazonaws.com/nodegroup: ng-1
+      volumes:
+        - name: resize-test-pv
+          persistentVolumeClaim:
+            claimName: resize-pvc-test
+      containers:
+        - name: pvc-test-container
+          env:
+          - name: AWS_REGION
+            value: us-west-2
+          #image: ami-0c990400e01c5bda6 # EKS ubuntu cloud image
+          image: nginx
+          imagePullPolicy: IfNotPresent
+          resources:
+              requests:
+                memory: 100Mi
+          volumeMounts:
+            - mountPath: "/tofill"
+              name: resize-test-pv
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: 
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
+      serviceAccount: pvc-test-sa
+      serviceAccountName: pvc-test-sa
+
+
