@@ -40,6 +40,8 @@ Shoreline Op Packs are open-source collections of Terraform configurations and s
   </tbody>
 </table>
 
+-> Azure does not currently support resizing attached volumes.
+
 ### PVC Autoscale
 
 This OpPack automatically resizes Kubernetes Persistent Volumes when they reach a certain capacity.
