@@ -96,10 +96,10 @@ do_setup_kube() {
 
 do_cleanup_kube() {
   echo "Cleaning up k8s objects (pv, pvc, pods)"
-  kubectl -n pvc-test-ns delete pod,deployment,pvc,role,rolebinding --all
+  kubectl -n pvc-test-ns delete pod,deployment,service,statefulset,pvc,role,rolebinding --all
   #kubectl delete pv resize-test-pv # auto-deleted
-  kubectl delete storageclass pvc-test-storage-class
-  kubectl -n pvc-test-ns delete sa pvc-test-sa
+  kubectl delete storageclass pvc-test-storage-class || /bin/true
+  kubectl -n pvc-test-ns delete sa pvc-test-sa || /bin/true
 }
 
 ############################################################

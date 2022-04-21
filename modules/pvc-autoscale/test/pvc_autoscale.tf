@@ -20,9 +20,10 @@ locals {
 
 module "pvc_autoscale" {
   #url = "${var.shoreline_url}"
+  #source             = "terraform-shoreline-modules/disk-op-pack/shoreline//modules/pvc-autoscale"
   source             = "../"
   prefix             = "${local.prefix}"
-  pvc_regex          = "resize-pvc-test"
+  pvc_regex          = "resize-test-pvc"
   mount_regex        = "tofill"
   disk_threshold     = 30
   increment          = 10
