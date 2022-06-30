@@ -1,55 +1,54 @@
 {
-    "cells": [
-      {
-        "content": "## Check used percentage of disk\nChecking the usage of '/tofill' disk. The exit code is the percentage of the disk",
-        "enabled": true,
-        "name": "unnamed",
-        "type": "MARKDOWN"
-      },
-      {
-        "content": "pods | name =~ \"pvc-test\" | testpvc_check_disk(\"tofill\")",
-        "enabled": true,
-        "name": "unnamed",
-        "type": "OP_LANG"
-      },
-      {
-        "content": "## List pods with used percentage of disk greater than a threshold\nPods with used percentage of disk '/tofill' greater than 30 percent",
-        "enabled": true,
-        "name": "unnamed",
-        "type": "MARKDOWN"
-      },
-      {
-        "content": "pods | name =~ \"pvc-test\" | filter( testpvc_check_disk('tofill') >= 30 )",
-        "enabled": true,
-        "name": "unnamed",
-        "type": "OP_LANG"
-      },
-      {
-        "content": "## List PVC alarms that have triggered",
-        "enabled": true,
-        "name": "unnamed",
-        "type": "MARKDOWN"
-      },
-      {
-        "content": "events | name =~ 'pvc'",
-        "enabled": true,
-        "name": "unnamed",
-        "type": "OP_LANG"
-      },
-      {
-        "content": "## Resize PVC\nResize Persistent Volume Claim (PVC) manually.\n\n\n\nParameters:\n\n- volume matching regular expression\n- amount to increment the size by\n- maximum size to let the volume grow to\n- pod name to execute the resize on\n- k8s namespace to execute the resize in",
-        "enabled": true,
-        "name": "unnamed",
-        "type": "MARKDOWN"
-      },
-      {
-        "content": "pods | name =~ \"pvc-test\" | testpvc_resize_pvc_manual('resize-test-pvc', 10, 200, 'pvc-test-0', 'pvc-test-ns')",
-        "enabled": true,
-        "name": "unnamed",
-        "type": "OP_LANG"
-      }
-    ],
-    "enabled": true,
-    "params": []
-  }
-  
+  "cells": [
+    {
+      "content": "## Check used percentage of disk\nChecking the usage of '/tofill' disk. The exit code is the percentage of the disk",
+      "enabled": true,
+      "name": "unnamed",
+      "type": "MARKDOWN"
+    },
+    {
+      "content": "pods | name =~ \"pvc-test\" | testpvc_check_disk(\"tofill\")",
+      "enabled": true,
+      "name": "unnamed",
+      "type": "OP_LANG"
+    },
+    {
+      "content": "## List pods with used percentage of disk greater than a threshold\nPods with used percentage of disk '/tofill' greater than 30 percent",
+      "enabled": true,
+      "name": "unnamed",
+      "type": "MARKDOWN"
+    },
+    {
+      "content": "pods | name =~ \"pvc-test\" | filter( testpvc_check_disk('tofill') >= 30 )",
+      "enabled": true,
+      "name": "unnamed",
+      "type": "OP_LANG"
+    },
+    {
+      "content": "## List PVC alarms that have triggered",
+      "enabled": true,
+      "name": "unnamed",
+      "type": "MARKDOWN"
+    },
+    {
+      "content": "events | name =~ 'pvc'",
+      "enabled": true,
+      "name": "unnamed",
+      "type": "OP_LANG"
+    },
+    {
+      "content": "## Resize PVC\nResize Persistent Volume Claim (PVC) manually.\n\n\n\nParameters:\n\n- volume matching regular expression\n- amount to increment the size by\n- maximum size to let the volume grow to\n- pod name to execute the resize on\n- k8s namespace to execute the resize in",
+      "enabled": true,
+      "name": "unnamed",
+      "type": "MARKDOWN"
+    },
+    {
+      "content": "pods | name =~ \"pvc-test\" | testpvc_resize_pvc_manual('resize-test-pvc', 10, 200, 'pvc-test-0', 'pvc-test-ns')",
+      "enabled": true,
+      "name": "unnamed",
+      "type": "OP_LANG"
+    }
+  ],
+  "enabled": true,
+  "params": []
+}
