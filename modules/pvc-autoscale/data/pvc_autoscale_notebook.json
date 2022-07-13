@@ -49,25 +49,25 @@
       "type": "MARKDOWN"
     },
     {
-      "content": "host | pod | app = \"net-test\" | `apt-get update`",
+      "content": "host | pod | app = \"pvc-test\" | `apt-get update`",
       "enabled": false,
       "name": "unnamed",
       "type": "OP_LANG"
     },
     {
-      "content": "host | pod | app = \"net-test\" | `apt-get install -y jq iproute2 python3 procps psmisc`",
+      "content": "host | pod | app = \"pvc-test\" | `apt-get install -y jq iproute2 python3 procps psmisc`",
       "enabled": false,
       "name": "unnamed",
       "type": "OP_LANG"
     },
     {
-      "content": "host | pod | app = \"net-test\" | `curl -LO https://dl.k8s.io/release/v1.20.0/bin/linux/amd64/kubectl`",
+      "content": "host | pod | app = \"pvc-test\" | `curl -LO https://dl.k8s.io/release/v1.20.0/bin/linux/amd64/kubectl`",
       "enabled": false,
       "name": "unnamed",
       "type": "OP_LANG"
     },
     {
-      "content": "host | pod | app = \"net-test\" | `chmod +x kubectl; mv kubectl /bin/`",
+      "content": "host | pod | app = \"pvc-test\" | `chmod +x kubectl; mv kubectl /bin/`",
       "enabled": false,
       "name": "unnamed",
       "type": "OP_LANG"
@@ -103,13 +103,13 @@
       "type": "OP_LANG"
     },
     {
-      "content": "## Fill disk\nFill disk with file of size 100MB.",
+      "content": "## Fill disk\nFill disk with file of size 300MB.",
       "enabled": false,
       "name": "unnamed",
       "type": "MARKDOWN"
     },
     {
-      "content": "pod | app='pvc-test' | `head -c 100000000 /dev/zero > /tofill/bar1`",
+      "content": "pod | app='pvc-test' | `head -c 300000000 /dev/zero > /tofill/bar1`",
       "enabled": false,
       "name": "unnamed",
       "type": "OP_LANG"
@@ -127,25 +127,7 @@
       "type": "OP_LANG"
     },
     {
-      "content": "Add another 100MB file.",
-      "enabled": false,
-      "name": "unnamed",
-      "type": "MARKDOWN"
-    },
-    {
-      "content": "pod | app='pvc-test' | `head -c 100000000 /dev/zero > /tofill/bar2`",
-      "enabled": false,
-      "name": "unnamed",
-      "type": "OP_LANG"
-    },
-    {
-      "content": "Check disk usage after filling the disk.",
-      "enabled": false,
-      "name": "unnamed",
-      "type": "MARKDOWN"
-    },
-    {
-      "content": "pods | name =~ \"pvc-test\" | testpvc_check_disk(\"tofill\")",
+      "content": "pods | name =~ \"pvc-test\" | filter( testpvc_check_disk('tofill') >= 30 )",
       "enabled": false,
       "name": "unnamed",
       "type": "OP_LANG"
