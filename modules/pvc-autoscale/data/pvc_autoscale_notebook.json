@@ -1,0 +1,138 @@
+{
+  "cells": [
+    {
+      "content": "# Setup\nInstall required packages and configure pods for testing.",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "MARKDOWN"
+    },
+    {
+      "content": "## Setup Kubernetes\nSetup kubernetes objects for the test.",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "MARKDOWN"
+    },
+    {
+      "content": "pods | app =~ \"shoreline\" | limit=1 | `kubectl apply -f  \"/tmp/pvc_test.yaml\"`",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "OP_LANG"
+    },
+    {
+      "content": "If you ran into permission problem, run the apply command (`kubectl apply -f \"pvc_test.yaml\"`) with a user having sufficient permission. Content of the k8s manifest file can be seen with the `cat` command below. It might take a while for the files to propagate.",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "MARKDOWN"
+    },
+    {
+      "content": "pods | app =~ \"shoreline\" | limit=1 | `cat  \"/tmp/pvc_test.yaml\"`",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "OP_LANG"
+    },
+    {
+      "content": "Verify that `pvc-test` pods have been created.",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "MARKDOWN"
+    },
+    {
+      "content": "pods | app = \"pvc-test\"",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "OP_LANG"
+    },
+    {
+      "content": "## Install Packages in Pods",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "MARKDOWN"
+    },
+    {
+      "content": "host | pod | app = \"pvc-test\" | `apt-get update && apt-get install -y jq iproute2 python3 procps psmisc && curl -LO https://dl.k8s.io/release/v1.20.0/bin/linux/amd64/kubectl && chmod +x kubectl; mv kubectl /bin/`",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "OP_LANG"
+    },
+    {
+      "content": "# PVC Autoscale",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "MARKDOWN"
+    },
+    {
+      "content": "## Check used percentage of disk\nChecking the usage of `/tofill` disk. The exit code is the percentage of the disk usage.",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "MARKDOWN"
+    },
+    {
+      "content": "pods | name =~ \"pvc-test\" | testpvc_check_disk(\"tofill\")",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "OP_LANG"
+    },
+    {
+      "content": "## List pods with used percentage of disk greater than a threshold\nPods with used percentage of disk `/tofill` greater than 30 percent.",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "MARKDOWN"
+    },
+    {
+      "content": "pods | name =~ \"pvc-test\" | filter( testpvc_check_disk('tofill') >= 30 )",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "OP_LANG"
+    },
+    {
+      "content": "## Fill disk\nFill disk with file of size 300MB and check disk usage after filling the disk.",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "MARKDOWN"
+    },
+    {
+      "content": "pod | app='pvc-test' | `head -c 300000000 /dev/zero > /tofill/bar1` | testpvc_check_disk(\"tofill\")",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "OP_LANG"
+    },
+    {
+      "content": "List pods with used percentage of disk greater than a threshold. \n\nNote: If the alarm has already triggered, the disk usage would be less than threshold because of the remediation action.",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "MARKDOWN"
+    },
+    {
+      "content": "pods | name =~ \"pvc-test\" | filter( testpvc_check_disk('tofill') >= 30 )",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "OP_LANG"
+    },
+    {
+      "content": "## List PVC alarms that have triggered\nAlarm will trigger when disk usage is larger than a percentage threshold.",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "MARKDOWN"
+    },
+    {
+      "content": "events | name =~ 'pvc'",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "OP_LANG"
+    },
+    {
+      "content": "## Resize PVC\nResize Persistent Volume Claim (PVC) manually.\n\n\n\nParameters:\n\n- volume matching regular expression\n- amount to increment the size by\n- maximum size to let the volume grow to\n- pod name to execute the resize on\n- k8s namespace to execute the resize in",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "MARKDOWN"
+    },
+    {
+      "content": "pods | name =~ \"pvc-test\" | testpvc_resize_pvc_manual('resize-test-pvc', 10, 200, 'pvc-test-0', 'pvc-test-ns')",
+      "enabled": false,
+      "name": "unnamed",
+      "type": "OP_LANG"
+    }
+  ],
+  "enabled": true,
+  "params": []
+}

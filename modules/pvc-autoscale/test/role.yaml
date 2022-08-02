@@ -1,0 +1,17 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: test4-cust # namespace for shoreline agent
+  name: shoreline-agent-test # the role binding for shoreline agent's service account
+rules:
+- apiGroups: [""]
+  resources: ["events", "namespaces", "pods", "pods/log"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["get", "create"]
+- apiGroups: [""]
+  resources: ["persistenvolumes", "persistentvolumeclaims"]
+  verbs: ["get", "list", "patch", "watch"]
+
+# kubectl apply -f role.yaml
