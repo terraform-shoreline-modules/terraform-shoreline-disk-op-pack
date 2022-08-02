@@ -19,7 +19,7 @@
       "type": "OP_LANG"
     },
     {
-      "content": "If you ran into permission problem, run the apply command (kubectl apply -f \"/tmp/pvc_test.yaml\") with a user having sufficient permission. Content of the k8s manifest file:",
+      "content": "If you ran into permission problem, run the apply command (`kubectl apply -f \"pvc_test.yaml\"`) with a user having sufficient permission. Content of the k8s manifest file can be seen with the `cat` command below. It might take a while for the files to propagate.",
       "enabled": false,
       "name": "unnamed",
       "type": "MARKDOWN"
@@ -31,7 +31,7 @@
       "type": "OP_LANG"
     },
     {
-      "content": "Verify that pvc-test pods have been created.",
+      "content": "Verify that `pvc-test` pods have been created.",
       "enabled": false,
       "name": "unnamed",
       "type": "MARKDOWN"
@@ -49,25 +49,7 @@
       "type": "MARKDOWN"
     },
     {
-      "content": "host | pod | app = \"pvc-test\" | `apt-get update`",
-      "enabled": false,
-      "name": "unnamed",
-      "type": "OP_LANG"
-    },
-    {
-      "content": "host | pod | app = \"pvc-test\" | `apt-get install -y jq iproute2 python3 procps psmisc`",
-      "enabled": false,
-      "name": "unnamed",
-      "type": "OP_LANG"
-    },
-    {
-      "content": "host | pod | app = \"pvc-test\" | `curl -LO https://dl.k8s.io/release/v1.20.0/bin/linux/amd64/kubectl`",
-      "enabled": false,
-      "name": "unnamed",
-      "type": "OP_LANG"
-    },
-    {
-      "content": "host | pod | app = \"pvc-test\" | `chmod +x kubectl; mv kubectl /bin/`",
+      "content": "host | pod | app = \"pvc-test\" | `apt-get update && apt-get install -y jq iproute2 python3 procps psmisc && curl -LO https://dl.k8s.io/release/v1.20.0/bin/linux/amd64/kubectl && chmod +x kubectl; mv kubectl /bin/`",
       "enabled": false,
       "name": "unnamed",
       "type": "OP_LANG"
@@ -79,7 +61,7 @@
       "type": "MARKDOWN"
     },
     {
-      "content": "## Check used percentage of disk\nChecking the usage of '/tofill' disk. The exit code is the percentage of the disk",
+      "content": "## Check used percentage of disk\nChecking the usage of `/tofill` disk. The exit code is the percentage of the disk usage.",
       "enabled": false,
       "name": "unnamed",
       "type": "MARKDOWN"
@@ -91,7 +73,7 @@
       "type": "OP_LANG"
     },
     {
-      "content": "## List pods with used percentage of disk greater than a threshold\nPods with used percentage of disk '/tofill' greater than 30 percent",
+      "content": "## List pods with used percentage of disk greater than a threshold\nPods with used percentage of disk `/tofill` greater than 30 percent.",
       "enabled": false,
       "name": "unnamed",
       "type": "MARKDOWN"
@@ -103,28 +85,22 @@
       "type": "OP_LANG"
     },
     {
-      "content": "## Fill disk\nFill disk with file of size 300MB.",
+      "content": "## Fill disk\nFill disk with file of size 300MB and check disk usage after filling the disk.",
       "enabled": false,
       "name": "unnamed",
       "type": "MARKDOWN"
     },
     {
-      "content": "pod | app='pvc-test' | `head -c 300000000 /dev/zero > /tofill/bar1`",
+      "content": "pod | app='pvc-test' | `head -c 300000000 /dev/zero > /tofill/bar1` | testpvc_check_disk(\"tofill\")",
       "enabled": false,
       "name": "unnamed",
       "type": "OP_LANG"
     },
     {
-      "content": "Check disk usage after filling the disk.",
+      "content": "List pods with used percentage of disk greater than a threshold. \n\nNote: If the alarm has already triggered, the disk usage would be less than threshold because of the remediation action.",
       "enabled": false,
       "name": "unnamed",
       "type": "MARKDOWN"
-    },
-    {
-      "content": "pods | name =~ \"pvc-test\" | testpvc_check_disk(\"tofill\")",
-      "enabled": false,
-      "name": "unnamed",
-      "type": "OP_LANG"
     },
     {
       "content": "pods | name =~ \"pvc-test\" | filter( testpvc_check_disk('tofill') >= 30 )",

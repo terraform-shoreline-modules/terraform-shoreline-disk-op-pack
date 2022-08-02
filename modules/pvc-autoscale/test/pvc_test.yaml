@@ -1,0 +1,131 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pvc-test-ns
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: pvc-test-ns
+  name: pvc-test-sa
+automountServiceAccountToken: true
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: pvc-test-ns
+  name: pvc-test-sa-role
+rules:
+- apiGroups: [""]
+  resources: ["endpoints", "services"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["events", "namespaces", "pods", "pods/log"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["get", "create"]
+- apiGroups: [""]
+  resources: ["persistenvolumes", "persistentvolumeclaims"]
+  verbs: ["get", "list", "patch", "watch"]
+# - apiGroups: [""]
+#   resources: ["persistentvolumeclaims"]
+#   verbs: ["get", "list", "patch", "watch"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: pvc-test-ns
+  name: pvc-test-sa-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: pvc-test-sa-role
+subjects:
+- kind: ServiceAccount
+  namespace: pvc-test-ns
+  name: pvc-test-sa
+  #name: system:serviceaccount:pvc-test-sa
+  #apiGroup: rbac.authorization.k8s.io
+
+---
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  namespace: pvc-test-ns
+  name: pvc-test-storage-class
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+  fsType: ext4
+allowVolumeExpansion: true
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pvc-test
+  labels:
+    app: pvc-test
+  namespace: pvc-test-ns
+spec:
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None
+  selector:
+    app: pvc-test
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: pvc-test
+  namespace: pvc-test-ns
+spec:
+  serviceName: "pvc-test"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pvc-test
+  template:
+    metadata:
+      labels:
+        app: pvc-test
+      namespace: pvc-test-ns
+    spec:
+      nodeSelector:
+          eks.amazonaws.com/nodegroup: ng-1
+      containers:
+        - name: pvc-test-container
+          image: nginx
+          ports:
+          - containerPort: 80
+            name: web
+          volumeMounts:
+            - mountPath: "/tofill"
+              name: resize-test-pvc
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: 
+      serviceAccount: pvc-test-sa
+      serviceAccountName: pvc-test-sa
+  volumeClaimTemplates:
+  - metadata:
+      name: resize-test-pvc
+      namespace: pvc-test-ns
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: pvc-test-storage-class
+

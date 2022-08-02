@@ -2,7 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   namespace: test4-cust # namespace for shoreline agent
-  name: shoreline-agent-test # the role binded to shoreline agent's service account
+  name: shoreline-agent-test # the role binding for shoreline agent's service account
 rules:
 - apiGroups: [""]
   resources: ["events", "namespaces", "pods", "pods/log"]
